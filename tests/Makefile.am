@@ -122,6 +122,8 @@ TESTS =						\
   rm/r-2					\
   rm/r-3					\
   rm/r-4					\
+  rm/d-1					\
+  rm/d-2					\
   rm/readdir-bug				\
   rm/rm1					\
   touch/empty-file				\

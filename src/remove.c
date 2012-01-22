@@ -460,12 +460,18 @@ rm_fts (FTS *fts, FTSENT *ent, struct rm_options const *x)
     case FTS_D:			/* preorder directory */
       if (! x->recursive)
         {
-          /* This is the first (pre-order) encounter with a directory.
-             Not recursive, so arrange to skip contents.  */
-          error (0, EISDIR, _("cannot remove %s"), quote (ent->fts_path));
-          mark_ancestor_dirs (ent);
-          fts_skip_tree (fts, ent);
-          return RM_ERROR;
+          if (! x->remove_empty_directories
+              || !is_empty_dir (fts->fts_cwd_fd, ent->fts_accpath))
+            {
+              /* This is the first (pre-order) encounter with a directory
+               * which we can not delete.
+                 Not recursive, so arrange to skip contents.  */
+              int err = x->remove_empty_directories ? ENOTEMPTY : EISDIR;
+              error (0, err, _("cannot remove %s"), quote (ent->fts_path));
+              mark_ancestor_dirs (ent);
+              fts_skip_tree (fts, ent);
+              return RM_ERROR;
+            }
         }
 
       /* Perform checks that can apply only for command-line arguments.  */
